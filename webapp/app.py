@@ -60,4 +60,28 @@ def player_perf():
 def get_best_xi():
     return jsonify(best_xi.fillna('').to_dict(orient='records'))
 
+@app.route('/analytics/top_batsmen')
+def top_batsmen():
+    from sqlalchemy import create_engine, text
+    engine = create_engine('mysql+pymysql://root:Charan%40123@localhost/ipl_analytics')
+    with engine.connect() as conn:
+        data = pd.read_sql("SELECT Batter, SUM(`Batsman Runs`) AS Runs FROM deliveries GROUP BY Batter ORDER BY Runs DESC LIMIT 10", conn)
+    return jsonify(data.to_dict(orient='records'))
+
+@app.route('/analytics/season_matches')
+def season_matches():
+    from sqlalchemy import create_engine
+    engine = create_engine('mysql+pymysql://root:Charan%40123@localhost/ipl_analytics')
+    with engine.connect() as conn:
+        data = pd.read_sql("SELECT Season, COUNT(*) AS Matches FROM matches GROUP BY Season ORDER BY Season", conn)
+    return jsonify(data.to_dict(orient='records'))
+
+@app.route('/analytics/team_wins')
+def team_wins():
+    from sqlalchemy import create_engine
+    engine = create_engine('mysql+pymysql://root:Charan%40123@localhost/ipl_analytics')
+    with engine.connect() as conn:
+        data = pd.read_sql("SELECT Winner AS Team, COUNT(*) AS Wins FROM matches WHERE Winner != 'No Result' GROUP BY Winner ORDER BY Wins DESC LIMIT 8", conn)
+    return jsonify(data.to_dict(orient='records'))
+
 if __name__ == '__main__': app.run(debug=True)
