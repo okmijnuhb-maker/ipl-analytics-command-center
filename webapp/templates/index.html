@@ -6,6 +6,7 @@
     <title>IPL Analytics Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -21,6 +22,7 @@
         <a href="#" class="nav-item" onclick="showSection('player-perf', this)">Player Performance</a>
         <a href="#" class="nav-item" onclick="showSection('toss', this)">Toss Recommender</a>
         <a href="#" class="nav-item" onclick="showSection('auction', this)">Auction Value</a>
+        <a href="#" class="nav-item" onclick="showSection('analytics', this)">Analytics</a>
         <a href="#" class="nav-item" onclick="showSection('about', this)">About</a>
     </nav>
     <div class="sidebar-footer">
@@ -208,6 +210,24 @@
             </div>
             <button class="btn" onclick="predictAuction()">Predict Value</button>
             <div class="result" id="av-result"></div>
+        </div>
+    </section>
+
+    <!-- Analytics -->
+    <section id="analytics" class="section">
+        <h2>Advanced Analytics</h2>
+        <p class="subtitle">Deep dive into IPL statistics and trends</p>
+        <div class="card" style="margin-bottom:24px">
+            <h3 style="color:var(--navy);margin-bottom:16px">Top 10 Run Scorers</h3>
+            <canvas id="batChart" height="300"></canvas>
+        </div>
+        <div class="card" style="margin-bottom:24px">
+            <h3 style="color:var(--navy);margin-bottom:16px">Matches Per Season</h3>
+            <canvas id="seasonChart" height="250"></canvas>
+        </div>
+        <div class="card">
+            <h3 style="color:var(--navy);margin-bottom:16px">Team Win Count</h3>
+            <canvas id="teamChart" height="250"></canvas>
         </div>
     </section>
 
