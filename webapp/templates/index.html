@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPL Analytics Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="logo">
+        <h1>IPL Analytics</h1>
+        <span>Command Center</span>
+    </div>
+    <nav>
+        <a href="#" class="nav-item active" onclick="showSection('win-prob', this)">Win Probability</a>
+        <a href="#" class="nav-item" onclick="showSection('score-pred', this)">Score Predictor</a>
+        <a href="#" class="nav-item" onclick="showSection('best-xi', this)">Best XI</a>
+        <a href="#" class="nav-item" onclick="showSection('player-perf', this)">Player Performance</a>
+        <a href="#" class="nav-item" onclick="showSection('toss', this)">Toss Recommender</a>
+        <a href="#" class="nav-item" onclick="showSection('auction', this)">Auction Value</a>
+        <a href="#" class="nav-item" onclick="showSection('about', this)">About</a>
+    </nav>
+    <div class="sidebar-footer">
+        <p>Developed by</p>
+        <h3>J. Charan Reddy</h3>
+        <span>Data Scientist</span>
+    </div>
+</aside>
+
+<main class="main">
+
+    <!-- Win Probability -->
+    <section id="win-prob" class="section active">
+        <h2>Win Probability Predictor</h2>
+        <p class="subtitle">Predict match win probability based on current match situation</p>
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Runs Scored</label>
+                    <input type="number" id="wp-runs" placeholder="e.g. 87">
+                </div>
+                <div class="form-group">
+                    <label>Balls Played</label>
+                    <input type="number" id="wp-balls" placeholder="e.g. 60">
+                </div>
+                <div class="form-group">
+                    <label>Wickets Fallen</label>
+                    <input type="number" id="wp-wickets" placeholder="e.g. 3">
+                </div>
+                <div class="form-group">
+                    <label>Target</label>
+                    <input type="number" id="wp-target" placeholder="e.g. 175">
+                </div>
+            </div>
+            <button class="btn" onclick="predictWinProb()">Predict</button>
+            <div class="result" id="wp-result"></div>
+        </div>
+    </section>
+
+    <!-- Score Predictor -->
+    <section id="score-pred" class="section">
+        <h2>Score Predictor</h2>
+        <p class="subtitle">Predict the final innings score from current match situation</p>
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Runs So Far</label>
+                    <input type="number" id="sp-runs" placeholder="e.g. 80">
+                </div>
+                <div class="form-group">
+                    <label>Balls Played</label>
+                    <input type="number" id="sp-balls" placeholder="e.g. 60">
+                </div>
+                <div class="form-group">
+                    <label>Wickets Fallen</label>
+                    <input type="number" id="sp-wickets" placeholder="e.g. 2">
+                </div>
+            </div>
+            <button class="btn" onclick="predictScore()">Predict</button>
+            <div class="result" id="sp-result"></div>
+        </div>
+    </section>
+
+    <!-- Best XI -->
+    <section id="best-xi" class="section">
+        <h2>Best Playing XI</h2>
+        <p class="subtitle">AI recommended best playing XI based on overall IPL performance</p>
+        <div class="card">
+            <button class="btn" onclick="getBestXI()">Get Best XI</button>
+            <div class="result" id="xi-result"></div>
+        </div>
+    </section>
+
+    <!-- Player Performance -->
+    <section id="player-perf" class="section">
+        <h2>Player Performance Predictor</h2>
+        <p class="subtitle">Predict player batting average against a specific opponent</p>
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Total Runs</label>
+                    <input type="number" id="pp-runs" placeholder="e.g. 500">
+                </div>
+                <div class="form-group">
+                    <label>Balls Faced</label>
+                    <input type="number" id="pp-balls" placeholder="e.g. 400">
+                </div>
+                <div class="form-group">
+                    <label>Dismissals</label>
+                    <input type="number" id="pp-dismissals" placeholder="e.g. 10">
+                </div>
+                <div class="form-group">
+                    <label>Strike Rate</label>
+                    <input type="number" id="pp-sr" placeholder="e.g. 125">
+                </div>
+            </div>
+            <button class="btn" onclick="predictPlayerPerf()">Predict</button>
+            <div class="result" id="pp-result"></div>
+        </div>
+    </section>
+
+    <!-- Toss Recommender -->
+    <section id="toss" class="section">
+        <h2>Toss Decision Recommender</h2>
+        <p class="subtitle">Get the best toss decision based on venue history</p>
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: span 2">
+                    <label>Select Venue</label>
+                    <select id="toss-venue">
+                        <option value="0">Arun Jaitley Stadium</option>
+                        <option value="1">Arun Jaitley Stadium, Delhi</option>
+                        <option value="2">Barabati Stadium</option>
+                        <option value="3">Barsapara Cricket Stadium, Guwahati</option>
+                        <option value="4">Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow</option>
+                        <option value="5">Brabourne Stadium</option>
+                        <option value="6">Brabourne Stadium, Mumbai</option>
+                        <option value="9">Dr Dy Patil Sports Academy</option>
+                        <option value="11">Dr. Y.S. Rajasekhara Reddy Aca-Vdca Cricket Stadium</option>
+                        <option value="13">Dubai International Cricket Stadium</option>
+                        <option value="14">Eden Gardens</option>
+                        <option value="15">Eden Gardens, Kolkata</option>
+                        <option value="16">Feroz Shah Kotla</option>
+                        <option value="18">Himachal Pradesh Cricket Association Stadium</option>
+                        <option value="20">Holkar Cricket Stadium</option>
+                        <option value="23">M Chinnaswamy Stadium</option>
+                        <option value="24">M Chinnaswamy Stadium, Bengaluru</option>
+                        <option value="26">MA Chidambaram Stadium</option>
+                        <option value="27">MA Chidambaram Stadium, Chepauk</option>
+                        <option value="29">Maharaja Yadavindra Singh International Cricket Stadium</option>
+                        <option value="30">Maharashtra Cricket Association Stadium</option>
+                        <option value="32">Narendra Modi Stadium, Ahmedabad</option>
+                        <option value="37">Punjab Cricket Association IS Bindra Stadium</option>
+                        <option value="41">Rajiv Gandhi International Stadium</option>
+                        <option value="42">Rajiv Gandhi International Stadium, Uppal</option>
+                        <option value="44">Sardar Patel Stadium, Motera</option>
+                        <option value="45">Saurashtra Cricket Association Stadium</option>
+                        <option value="46">Sawai Mansingh Stadium</option>
+                        <option value="47">Sawai Mansingh Stadium, Jaipur</option>
+                        <option value="49">Sharjah Cricket Stadium</option>
+                        <option value="50">Sheikh Zayed Stadium</option>
+                        <option value="52">Subrata Roy Sahara Stadium</option>
+                        <option value="54">Vidarbha Cricket Association Stadium, Jamtha</option>
+                        <option value="55">Wankhede Stadium</option>
+                        <option value="56">Wankhede Stadium, Mumbai</option>
+                        <option value="57">Zayed Cricket Stadium, Abu Dhabi</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" onclick="predictToss()">Recommend</button>
+            <div class="result" id="toss-result"></div>
+        </div>
+    </section>
+
+    <!-- Auction Value -->
+    <section id="auction" class="section">
+        <h2>Auction Value Predictor</h2>
+        <p class="subtitle">Predict the IPL auction value of a player based on career stats</p>
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Total Runs</label>
+                    <input type="number" id="av-runs" placeholder="e.g. 3000">
+                </div>
+                <div class="form-group">
+                    <label>Strike Rate</label>
+                    <input type="number" id="av-sr" placeholder="e.g. 135">
+                </div>
+                <div class="form-group">
+                    <label>Fours</label>
+                    <input type="number" id="av-fours" placeholder="e.g. 200">
+                </div>
+                <div class="form-group">
+                    <label>Sixes</label>
+                    <input type="number" id="av-sixes" placeholder="e.g. 100">
+                </div>
+                <div class="form-group">
+                    <label>Wickets</label>
+                    <input type="number" id="av-wickets" placeholder="e.g. 50">
+                </div>
+                <div class="form-group">
+                    <label>Economy Rate</label>
+                    <input type="number" id="av-economy" placeholder="e.g. 7.5">
+                </div>
+            </div>
+            <button class="btn" onclick="predictAuction()">Predict Value</button>
+            <div class="result" id="av-result"></div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section">
+        <h2>About This Project</h2>
+        <p class="subtitle">IPL Analytics Command Center — Built by J. Charan Reddy</p>
+        <div class="card">
+            <div class="about-grid">
+                <div class="about-info">
+                    <div class="developer-card">
+                        <div class="avatar">JCR</div>
+                        <div>
+                            <h3>J. Charan Reddy</h3>
+                            <p>Data Scientist & Analyst</p>
+                        </div>
+                    </div>
+                    <p class="about-desc">An end-to-end IPL Analytics platform built using Python, SQL, Machine Learning and Flask. This project covers data cleaning, SQL analysis, ML modelling and a live web application.</p>
+                    <div class="tech-stack">
+                        <span class="badge">Python</span>
+                        <span class="badge">MySQL</span>
+                        <span class="badge">XGBoost</span>
+                        <span class="badge">Random Forest</span>
+                        <span class="badge">Flask</span>
+                        <span class="badge">Power BI</span>
+                        <span class="badge">HTML/CSS/JS</span>
+                    </div>
+                </div>
+                <div class="about-stats">
+                    <div class="stat-card"><h4>1095</h4><p>Matches Analysed</p></div>
+                    <div class="stat-card"><h4>260K+</h4><p>Ball by Ball Records</p></div>
+                    <div class="stat-card"><h4>6</h4><p>ML Models Built</p></div>
+                    <div class="stat-card"><h4>20</h4><p>SQL Queries</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
