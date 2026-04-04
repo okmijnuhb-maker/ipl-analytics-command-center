@@ -1,16 +1,20 @@
 # Flask Backend — IPL Analytics
 from flask import Flask, request, jsonify, render_template
 import pickle, numpy as np, pandas as pd
+import os
 
 app = Flask(__name__)
-path = r'C:\my project\ipl-analytics-command-center\ml_models'
 
-model_wp = pickle.load(open(f'{path}\\win_probability_model.pkl','rb'))
-model_sp = pickle.load(open(f'{path}\\score_predictor_model.pkl','rb'))
-model_td = pickle.load(open(f'{path}\\toss_recommender_model.pkl','rb'))
-model_av = pickle.load(open(f'{path}\\auction_value_model.pkl','rb'))
-model_pp = pickle.load(open(f'{path}\\player_performance_model.pkl','rb'))
-best_xi  = pd.read_csv(f'{path}\\best_xi.csv')
+# Relative path for Render deployment
+BASE = os.path.dirname(os.path.abspath(__file__))
+path = os.path.join(BASE, '..', 'ml_models')
+
+model_wp = pickle.load(open(os.path.join(path,'win_probability_model.pkl'),'rb'))
+model_sp = pickle.load(open(os.path.join(path,'score_predictor_model.pkl'),'rb'))
+model_td = pickle.load(open(os.path.join(path,'toss_recommender_model.pkl'),'rb'))
+model_av = pickle.load(open(os.path.join(path,'auction_value_model.pkl'),'rb'))
+model_pp = pickle.load(open(os.path.join(path,'player_performance_model.pkl'),'rb'))
+best_xi  = pd.read_csv(os.path.join(path,'best_xi.csv'))
 
 @app.route('/')
 def home(): return render_template('index.html')
