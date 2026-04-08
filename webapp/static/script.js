@@ -4,6 +4,7 @@ function showSection(id, el) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     el.classList.add('active');
+    if(id === 'analytics') loadAnalytics();
 }
 
 // Show Result
@@ -67,7 +68,7 @@ async function getBestXI() {
     data.forEach((p,i) => {
         html += `<tr><td><strong>#${i+1} ${p.Player}</strong></td><td>${p.Runs||'-'}</td><td>${p.SR ? (+p.SR).toFixed(1) : '-'}</td><td>${p.Wickets||'-'}</td><td>${p.Economy ? (+p.Economy).toFixed(1) : '-'}</td></tr>`;
     });
-    html += `</table><div class="result-desc" style="margin-top:12px">AI selected best XI based on overall IPL performance — batting score (50% runs, 30% SR, 20% boundaries) and bowling score (60% wickets, 40% economy).</div>`;
+    html += `</table><div class="result-desc" style="margin-top:12px">AI selected best XI based on overall IPL performance.</div>`;
     showResult('xi-result', html);
 }
 
@@ -102,7 +103,7 @@ async function predictToss() {
     const json = await res.json();
     const rec   = json.recommendation;
     const color = rec === 'Field' ? '#22c55e' : '#f59e0b';
-    const desc  = rec === 'Field' ? 'Fielding first is recommended at this venue — dew factor and pitch conditions favour chasing.'
+    const desc  = rec === 'Field' ? 'Fielding first is recommended — dew factor and pitch conditions favour chasing.'
                 : 'Batting first is recommended — this venue historically favours teams setting a target.';
     showResult('toss-result', `
         <div class="big-number" style="color:${color}">${rec} First</div>
@@ -137,58 +138,48 @@ async function predictAuction() {
 let batChartInstance, seasonChartInstance, teamChartInstance;
 
 async function loadAnalytics() {
-    const [batData, seasonData, teamData] = await Promise.all([
-        fetch('/analytics/top_batsmen').then(r => r.json()),
-        fetch('/analytics/season_matches').then(r => r.json()),
-        fetch('/analytics/team_wins').then(r => r.json())
-    ]);
+    try {
+        const [batData, seasonData, teamData] = await Promise.all([
+            fetch('/analytics/top_batsmen').then(r => r.json()),
+            fetch('/analytics/season_matches').then(r => r.json()),
+            fetch('/analytics/team_wins').then(r => r.json())
+        ]);
 
-    // Destroy old charts
-    if(batChartInstance) batChartInstance.destroy();
-    if(seasonChartInstance) seasonChartInstance.destroy();
-    if(teamChartInstance) teamChartInstance.destroy();
+        if(batChartInstance) batChartInstance.destroy();
+        if(seasonChartInstance) seasonChartInstance.destroy();
+        if(teamChartInstance) teamChartInstance.destroy();
 
-    // Top Batsmen Chart
-    batChartInstance = new Chart(document.getElementById('batChart'), {
-        type: 'bar',
-        data: {
-            labels: batData.map(d => d.Batter),
-            datasets: [{ label: 'Total Runs', data: batData.map(d => d.Runs),
-                backgroundColor: '#0A2647', borderRadius: 6 }]
-        },
-        options: { indexAxis:'y', plugins:{ legend:{ display:false } }, responsive:true }
-    });
+        batChartInstance = new Chart(document.getElementById('batChart'), {
+            type: 'bar',
+            data: {
+                labels: batData.map(d => d.Batter),
+                datasets: [{ label: 'Total Runs', data: batData.map(d => d.Runs),
+                    backgroundColor: '#0A2647', borderRadius: 6 }]
+            },
+            options: { indexAxis:'y', plugins:{ legend:{ display:false } }, responsive:true }
+        });
 
-    // Season Matches Chart
-    seasonChartInstance = new Chart(document.getElementById('seasonChart'), {
-        type: 'line',
-        data: {
-            labels: seasonData.map(d => d.Season),
-            datasets: [{ label: 'Matches', data: seasonData.map(d => d.Matches),
-                borderColor: '#FF6B35', backgroundColor: 'rgba(255,107,53,0.1)',
-                tension: 0.4, fill: true, pointRadius: 5 }]
-        },
-        options: { plugins:{ legend:{ display:false } }, responsive:true }
-    });
+        seasonChartInstance = new Chart(document.getElementById('seasonChart'), {
+            type: 'line',
+            data: {
+                labels: seasonData.map(d => d.Season),
+                datasets: [{ label: 'Matches', data: seasonData.map(d => d.Matches),
+                    borderColor: '#FF6B35', backgroundColor: 'rgba(255,107,53,0.1)',
+                    tension: 0.4, fill: true, pointRadius: 5 }]
+            },
+            options: { plugins:{ legend:{ display:false } }, responsive:true }
+        });
 
-    // Team Wins Chart
-    teamChartInstance = new Chart(document.getElementById('teamChart'), {
-        type: 'doughnut',
-        data: {
-            labels: teamData.map(d => d.Team),
-            datasets: [{ data: teamData.map(d => d.Wins),
-                backgroundColor: ['#0A2647','#FF6B35','#1F4E79','#C84B31','#2E86AB','#A23B72','#F18F01','#C73E1D'] }]
-        },
-        options: { responsive:true, plugins:{ legend:{ position:'right' } } }
-    });
-}
-
-// Update showSection to load analytics
-const origShowSection = showSection;
-function showSection(id, el) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    el.classList.add('active');
-    if(id === 'analytics') loadAnalytics();
+        teamChartInstance = new Chart(document.getElementById('teamChart'), {
+            type: 'doughnut',
+            data: {
+                labels: teamData.map(d => d.Team),
+                datasets: [{ data: teamData.map(d => d.Wins),
+                    backgroundColor: ['#0A2647','#FF6B35','#1F4E79','#C84B31','#2E86AB','#A23B72','#F18F01','#C73E1D'] }]
+            },
+            options: { responsive:true, plugins:{ legend:{ position:'right' } } }
+        });
+    } catch(e) {
+        console.error('Analytics error:', e);
+    }
 }
