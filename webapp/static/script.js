@@ -173,12 +173,13 @@ async function loadAnalytics() {
         teamChartInstance = new Chart(document.getElementById('teamChart'), {
             type: 'doughnut',
             data: {
-                labels: teamData.map(d => d.Team),
+                labels: teamData.map(d => d.Winner || d.Team),
                 datasets: [{ data: teamData.map(d => d.Wins),
                     backgroundColor: ['#0A2647','#FF6B35','#1F4E79','#C84B31','#2E86AB','#A23B72','#F18F01','#C73E1D'] }]
             },
             options: { responsive:true, plugins:{ legend:{ position:'right' } } }
         });
+
     } catch(e) {
         console.error('Analytics error:', e);
     }
