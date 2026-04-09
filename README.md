@@ -117,6 +117,6 @@ Full query outputs are in `IPL_SQL_Query_Results.docx`
 
 ## Developer
 
-**J. Charan Reddy** — Data Scientist & Analyst
+**J. Charan Reddy**
 
 ---
